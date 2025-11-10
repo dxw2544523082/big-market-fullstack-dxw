@@ -2,4 +2,4 @@ spring:
   config:
     name: big-market-dxw-app
   profiles:
-    active: dev
+    active: test
