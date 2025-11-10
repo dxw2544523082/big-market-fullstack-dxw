@@ -66,13 +66,6 @@ public class StrategyRepository implements IStrategyRepository {
     @Override
     public int getRateRange(Long strategyId) {
         return redisService.getValue(Constants.RedisKey.STRATEGY_RATE_RANGE_KEY + strategyId);
-
-//        Integer rateRange = redisService.getValue(Constants.RedisKey.STRATEGY_RATE_RANGE_KEY + strategyId);
-//        if (rateRange == null) {
-//            // 根据业务需求返回合适的默认值，这里假设默认值为0
-//            return 0;
-//        }
-//        return rateRange;
     }
 
 }
