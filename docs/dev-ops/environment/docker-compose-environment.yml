@@ -14,7 +14,7 @@ services:
       - "13306:3306"
     volumes:
       - ./mysql/sql:/docker-entrypoint-initdb.d
-      - mysql-data:/var/lib/mysql
+#      - mysql-data:/var/lib/mysql
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       interval: 5s
@@ -24,12 +24,12 @@ services:
     networks:
       - my-network
 
-  # 自动加载数据
-  mysql-job-dbdata:
-    image: alpine:3.18.2
-    container_name: mysql-job-dbdata
-    volumes:
-      - mysql-data:/var/lib/mysql
+#  # 自动加载数据
+#  mysql-job-dbdata:
+#    image: alpine:3.18.2
+#    container_name: mysql-job-dbdata
+#    volumes:
+#      - mysql-data:/var/lib/mysql
 
   # phpmyadmin https://hub.docker.com/_/phpmyadmin
   phpmyadmin:
@@ -89,8 +89,8 @@ services:
       redis:
         condition: service_healthy
 
-volumes:
-  mysql-data:  # 声明命名卷
+#volumes:
+#  mysql-data:  # 声明命名卷
 
 networks:
   my-network:
