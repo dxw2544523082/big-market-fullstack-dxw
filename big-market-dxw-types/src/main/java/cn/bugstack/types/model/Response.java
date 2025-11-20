@@ -1,4 +1,4 @@
-package cn.bugstack.api.response;
+package cn.bugstack.types.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,8 +12,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Response<T> implements Serializable {
-
-    private static final long serialVersionUID = 7000723935764546321L;
 
     private String code;
     private String info;
