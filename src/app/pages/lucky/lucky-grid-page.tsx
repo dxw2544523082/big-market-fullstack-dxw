@@ -47,7 +47,7 @@ export function LuckyGridPage() {
                 // @ts-ignore
                 myLucky.current.play()
                 setTimeout(() => {
-                    const index = Math.random() * 6 >> 0
+                    const index = Math.random() * 8 >> 0
                     // @ts-ignore
                     myLucky.current.stop(index)
                 }, 2500)
