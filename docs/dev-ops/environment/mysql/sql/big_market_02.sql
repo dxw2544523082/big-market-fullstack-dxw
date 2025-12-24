@@ -48,7 +48,7 @@ LOCK TABLES `raffle_activity_account` WRITE;
 
 INSERT INTO `raffle_activity_account` (`id`, `user_id`, `activity_id`, `total_count`, `total_count_surplus`, `day_count`, `day_count_surplus`, `month_count`, `month_count_surplus`, `create_time`, `update_time`)
 VALUES
-	(2,'xiaofuge',100301,4,3,4,3,4,3,'2024-03-23 12:40:56','2024-03-23 13:16:40');
+	(2,'dingxiaowu',100301,4,3,4,3,4,3,'2024-03-23 12:40:56','2024-03-23 13:16:40');
 
 /*!40000 ALTER TABLE `raffle_activity_account` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -155,7 +155,7 @@ LOCK TABLES `raffle_activity_order_001` WRITE;
 
 INSERT INTO `raffle_activity_order_001` (`id`, `user_id`, `sku`, `activity_id`, `activity_name`, `strategy_id`, `order_id`, `order_time`, `total_count`, `day_count`, `month_count`, `state`, `out_business_no`, `create_time`, `update_time`)
 VALUES
-	(3,'xiaofuge',9011,100301,'测试活动',100006,'383240888158','2024-03-23 04:38:23',1,1,1,'completed','700091009111','2024-03-23 12:38:23','2024-03-23 12:38:23');
+	(3,'dingxiaowu',9011,100301,'测试活动',100006,'383240888158','2024-03-23 04:38:23',1,1,1,'completed','700091009111','2024-03-23 12:38:23','2024-03-23 12:38:23');
 
 /*!40000 ALTER TABLE `raffle_activity_order_001` ENABLE KEYS */;
 UNLOCK TABLES;
