@@ -23,7 +23,7 @@ import java.util.*;
  */
 @Slf4j
 @Service
-public class StrategyArmoryDispatch implements IStrategyArmory , IStrategyDispatch{
+public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatch {
 
     @Resource
     private IStrategyRepository repository;
@@ -142,9 +142,15 @@ public class StrategyArmoryDispatch implements IStrategyArmory , IStrategyDispat
     }
 
     @Override
-    public Boolean subtractionAwardStock(Long strategyId, Integer awardId) {
+    public Boolean subtractionAwardStock(Long strategyId, Integer awardId, Date endDateTime) {
         String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
-        return repository.subtractionAwardStock(cacheKey);
+        return repository.subtractionAwardStock(cacheKey, endDateTime);
     }
+
+//    @Override
+//    public Boolean subtractionAwardStock(Long strategyId, Integer awardId) {
+//        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
+//        return repository.subtractionAwardStock(cacheKey);
+//    }
 
 }
