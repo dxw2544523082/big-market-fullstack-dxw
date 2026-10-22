@@ -52,7 +52,26 @@
 - 回归中发现 lucky-canvas 在约 1 FPS 的节流环境中可能选择零减速距离，导致九宫格不结束。已调整安全动画参数、稳定传入 props，并增加超时保护：先展示真实后端结果，超时提示刷新而非自动重试抽奖。
 - 完整 `npm audit` 仍报告 5 个开发依赖高危条目，源头为 [braces 深度嵌套模式拒绝服务](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)，经 micromatch / fast-glob / Next ESLint 配置传播。当前自动修复建议降级到不兼容的 ESLint 配置主版本，故不盲目 `--force`。请只在可信源码上运行开发工具；这不是生产运行依赖的漏洞清零声明。
 
-最终修补提交仍需再次从 GitHub 克隆重建；完成后更新本节结果。
+## 最终修补版再次干净克隆：通过
+
+从 GitHub 再次克隆最终代码提交 `54ef049` 至另一个全新目录，仍确认无依赖、产物和私有配置；使用新的 `big-market-fullstack-verify-final` Compose 项目及**全新** MySQL 命名卷。
+
+| 最终版验证项 | 结果 |
+|---|---|
+| 根 README 启动流程 `python scripts/dev.py up` | 完整构建与启动成功 |
+| 后端 / 4 项编解码回归 | BUILD SUCCESS，4 passed / 0 failures / 0 errors |
+| npm ci / Next.js 16.4.2 生产构建 / ESLint / 独立 tsc | 全部通过 |
+| 生产依赖审计 | 0 漏洞 |
+| 连续装配 / 奖品列表 / 2 次 API 抽奖与落库 | 全部通过，额度减少 2 |
+| 浏览器大转盘 | 106「轻奢办公椅」，真实动画完成且按钮恢复 |
+| 浏览器九宫格 | 101「随机积分」，真实动画完成且按钮恢复 |
+| 页面、HTTP JSON 与 MySQL | 两笔新订单 used，中奖记录与奖品一致，task completed，额度减少 2 |
+| 页面运行错误 / 后端异常 | 0 page errors；backend.log 无 ERROR/Exception |
+| Git 工作区 | 构建与运行后仍干净 |
+
+浏览器该轮订单为 `581074226390`、`253185111522`，仅是隔离演示数据，不是实际权益发放。最终截图和原始 JSON/日志保存在该验证目录 `.runtime/`，仓库截图为同版代码的本地回归记录。
+
+最终功能代码已验证；后续提交仅补充此验证记录，不改变可执行代码。
 
 ## 证据与范围
 
