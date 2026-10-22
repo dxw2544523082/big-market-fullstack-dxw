@@ -8,6 +8,7 @@ declare module "@lucky-canvas/react" {
         buttons: Record<string, unknown>[];
         blocks?: Record<string, unknown>[];
         defaultStyle?: Record<string, unknown>;
+        defaultConfig?: Record<string, unknown>;
         rows?: number;
         cols?: number;
         onStart: () => void;

@@ -37,7 +37,7 @@
 
 | 后端 | 前端 | 本地基础设施 |
 |---|---|---|
-| JDK 8、Spring Boot 2.7.12、Maven | Next.js 16.0.3、React 19、TypeScript | MySQL 8.0.32 |
+| JDK 8、Spring Boot 2.7.12、Maven | Next.js 16.4.2、React 19.3.1、TypeScript | MySQL 8.0.32 |
 | MyBatis、db-router 1.0.2 | Tailwind CSS 4、lucky-canvas | Redis 6.2 / Redisson 3.23.4 |
 | Spring AMQP（版本跟随 Boot BOM） | 大转盘 / 九宫格 | RabbitMQ 3.12.9、Docker Compose v2 |
 
@@ -110,7 +110,9 @@ python scripts/dev.py up
 
 **<http://127.0.0.1:13000/?userId=fullstack_demo&activityId=100301>**
 
-点击「装配抽奖」，看到成功提示后，点击「大转盘抽奖」或「九宫格抽奖」。抽奖动画结束后页面会展示真实后端返回的奖品。
+点击「装配抽奖」，看到成功提示后，点击「大转盘抽奖」或「九宫格抽奖」。页面立即显示真实后端返回的奖品，动画停止在对应奖品；若浏览器节流导致动画超时，会保留真实结果并提示刷新，不再偷偷发送一次抽奖。
+
+![实际抽奖页面](docs/screenshots/draw-result.png)
 
 > 请使用 `127.0.0.1`，不要擅自改成 `localhost`：默认 CORS 允许源为 `http://127.0.0.1:13000`。改前端端口请同时修改根 `.env` 并重新构建。
 
@@ -220,6 +222,7 @@ curl -X POST "http://127.0.0.1:18091/api/v1/raffle/activity/draw" \
 - 本次修复了 Boot 2.7 与 AMQP 3.x 混用、Redis 缓存类型恢复、前端网络异常处理和 Mock 回退，移除了构建时 Google 字体/外部背景图片依赖。
 - `backend/docs/dev-ops/` 下旧 compose 和脚本是历史材料，**不要作为整合版启动入口**；使用仓库根的 `compose.infra.yml` 和 Python 脚本。
 - 本次以宿主机运行前后端、Docker 运行中间件为验收路径；未将旧应用 Dockerfile 宣称为已通过的全容器部署。
-- 使用已有版本验证运行，没有完成所有依赖安全升级、鉴权、防刷、限流或压力测试；仅供隔离的本地学习演示。
+- 前端已升级 Next.js 16.4.2 / React 19.3.1 并更新锁文件；本次 `npm audit --omit=dev` 为 **0 漏洞**。完整审计仍有 5 个由开发工具 `braces → fast-glob → eslint-config-next` 链引起的高危条目，当前提示的修复需跨主版本降级，未盲目 `--force`；它们不是生产运行依赖，详情见验证记录。
+- 尚未完成后端全部依赖安全审计、鉴权、防刷、限流或压力测试；仅供隔离的本地学习演示。
 
 更多：[架构说明](docs/ARCHITECTURE.md) · [迁移说明](docs/MIGRATION.md) · [验证记录](docs/VALIDATION.md)

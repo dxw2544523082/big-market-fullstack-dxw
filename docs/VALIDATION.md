@@ -33,7 +33,26 @@
 
 ## 第二轮：GitHub 干净克隆
 
-待仓库上传后，在全新克隆目录和全新的独立 Compose 数据卷上重复构建、启动、接口/数据库和浏览器联调；未完成前不标记通过。
+从公开 GitHub 仓库克隆提交 `4af00ea` 到全新目录，确认不存在 node_modules、target 或私有 .env。使用新的 Compose 项目和全新命名卷初始化三份 SQL 与演示账号，没有复用第一轮数据库。
+
+- `python scripts/dev.py up` 完整执行 Maven 打包、4 项编解码测试、npm ci、生产构建、TypeScript、ESLint并启动成功。
+- 2 次 API 抽奖和数据库对账通过。
+- 浏览器大转盘返回 106「轻奢办公椅」、九宫格返回 108「暴走玩偶」；页面、HTTP JSON、两笔 used 订单与中奖记录一致，额度减少 2，task 均 completed。
+- 后端日志无 ERROR/Exception；克隆工作区仍干净。
+- 对特殊依赖 `db-router-spring-boot-starter:1.0.2` 另外从 POM 声明的公共仓库下载 JAR，HTTP 200，SHA256 与实际使用的 JAR 相同，未依赖不可获取的本地私有安装。
+- 此验证为同机干净源码克隆，允许复用 Maven/npm 下载缓存，不冒称已在另一台空白机器上验证。
+
+## 前端依赖修补与运行回归
+
+初始生产依赖审计发现 1 critical + 4 high，已升级 Next.js `16.4.2`、React/React DOM `19.3.1`，更新配套 ESLint 配置及锁文件。
+
+- `npm audit --omit=dev`：**0 漏洞**。
+- 生产构建、ESLint、独立 `tsc --noEmit`：均通过。
+- 修补后真实 API 抽奖及落库检查通过；浏览器大转盘 101「随机积分」、九宫格 106「轻奢办公椅」，**两边均等待动画真正结束**，控件恢复可点击且页面、接口、数据库一致。
+- 回归中发现 lucky-canvas 在约 1 FPS 的节流环境中可能选择零减速距离，导致九宫格不结束。已调整安全动画参数、稳定传入 props，并增加超时保护：先展示真实后端结果，超时提示刷新而非自动重试抽奖。
+- 完整 `npm audit` 仍报告 5 个开发依赖高危条目，源头为 [braces 深度嵌套模式拒绝服务](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)，经 micromatch / fast-glob / Next ESLint 配置传播。当前自动修复建议降级到不兼容的 ESLint 配置主版本，故不盲目 `--force`。请只在可信源码上运行开发工具；这不是生产运行依赖的漏洞清零声明。
+
+最终修补提交仍需再次从 GitHub 克隆重建；完成后更新本节结果。
 
 ## 证据与范围
 
