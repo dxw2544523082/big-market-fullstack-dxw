@@ -1,0 +1,1 @@
+docker build -t dxw123/big-market-front-dxw-app:1.4 .
