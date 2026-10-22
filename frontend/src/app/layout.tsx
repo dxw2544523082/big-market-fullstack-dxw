@@ -1,34 +1,12 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type {Metadata} from "next";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "丁晓武的网页",
-  description: "测试前端React页面",
+    title: "大营销平台 · 前后端整合演示",
+    description: "DDD 抽奖活动后端与大转盘、九宫格前端的真实联调演示",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
+    // System fonts keep production builds independent of Google's font service.
+    return <html lang="zh-CN"><body>{children}</body></html>;
 }

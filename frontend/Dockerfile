@@ -13,7 +13,7 @@ FROM base AS builder
 WORKDIR /app
 # API_HOST_URL 必须是「构建期」变量：Next.js 会在 build 时把它内联进客户端产物，
 # 运行时再传环境变量已经来不及了。
-ARG API_HOST_URL=http://127.0.0.1:8091
+ARG API_HOST_URL=http://127.0.0.1:18091
 ENV API_HOST_URL=$API_HOST_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

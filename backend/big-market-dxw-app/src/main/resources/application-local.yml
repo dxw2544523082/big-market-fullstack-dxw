@@ -1,0 +1,89 @@
+# New monorepo's isolated local profile. Original dev/test/prod profiles are retained for history only.
+server:
+  port: ${BACKEND_PORT:18091}
+app:
+  config:
+    api-version: v1
+    cross-origin: '${FRONTEND_ORIGIN:http://127.0.0.1:13000}'
+spring:
+  rabbitmq:
+    addresses: ${RABBITMQ_HOST:127.0.0.1}:${RABBITMQ_PORT:25673}
+    username: ${RABBITMQ_USER:bigmarket}
+    password: ${RABBITMQ_PASSWORD:bigmarket-dev-only}
+    virtual-host: /
+    listener:
+      simple:
+        prefetch: 1
+    topic:
+      activity_sku_stock_zero: activity_sku_stock_zero
+      send_award: send_award
+thread:
+  pool:
+    executor:
+      config:
+        core-pool-size: 4
+        max-pool-size: 12
+        keep-alive-time: 60
+        block-queue-size: 1000
+        policy: CallerRunsPolicy
+mini-db-router:
+  jdbc:
+    datasource:
+      dbCount: 2
+      tbCount: 4
+      default: db00
+      routerKey: userId
+      list: db01,db02
+      db00:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:23306}/big_market?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:bigmarket-dev-only}
+        type-class-name: com.zaxxer.hikari.HikariDataSource
+        pool:
+          pool-name: config-pool
+          minimum-idle: 2
+          maximum-pool-size: 6
+          connection-timeout: 10000
+      db01:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:23306}/big_market_01?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:bigmarket-dev-only}
+        type-class-name: com.zaxxer.hikari.HikariDataSource
+        pool:
+          pool-name: shard01-pool
+          minimum-idle: 2
+          maximum-pool-size: 6
+          connection-timeout: 10000
+      db02:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:23306}/big_market_02?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+        username: ${MYSQL_USER:root}
+        password: ${MYSQL_PASSWORD:bigmarket-dev-only}
+        type-class-name: com.zaxxer.hikari.HikariDataSource
+        pool:
+          pool-name: shard02-pool
+          minimum-idle: 2
+          maximum-pool-size: 6
+          connection-timeout: 10000
+mybatis:
+  mapper-locations: classpath:/mybatis/mapper/*.xml
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+redis:
+  sdk:
+    config:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:26379}
+      pool-size: 10
+      min-idle-size: 2
+      idle-timeout: 30000
+      connect-timeout: 5000
+      retry-attempts: 3
+      retry-interval: 1000
+      ping-interval: 60000
+      keep-alive: true
+logging:
+  level:
+    root: info
+  config: classpath:logback-spring.xml

@@ -1,8 +1,14 @@
-/**
- * 策略奖品值对象
- */
 export interface RaffleAwardVO {
     awardId: number;
     awardTitle: string;
-    awardSubtitle: string;
+    awardSubtitle?: string;
+    sort: number;
+    isAwardUnlock: boolean;
+    waitUnLockCount: number;
+}
+
+export interface DrawResult {
+    awardId: number;
+    awardTitle: string;
+    awardIndex: number;
 }

@@ -1,0 +1,49 @@
+# Isolated local demo stack. All ports bind to loopback; no existing databases are reused.
+services:
+  mysql:
+    image: mysql:8.0.32
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-bigmarket-dev-only}
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-23306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backend/docs/dev-ops/environment/mysql/sql/big_market.sql:/docker-entrypoint-initdb.d/01-config.sql:ro
+      - ./backend/docs/dev-ops/environment/mysql/sql/big_market_01.sql:/docker-entrypoint-initdb.d/02-shard01.sql:ro
+      - ./backend/docs/dev-ops/environment/mysql/sql/big_market_02.sql:/docker-entrypoint-initdb.d/03-shard02.sql:ro
+      - ./infra/mysql/10-demo.sql:/docker-entrypoint-initdb.d/10-demo.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql -uroot -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+  redis:
+    image: redis:6.2
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-26379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  rabbitmq:
+    image: rabbitmq:3.12.9
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-bigmarket}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-bigmarket-dev-only}
+    ports:
+      - "127.0.0.1:${RABBITMQ_PORT:-25673}:5672"
+      - "127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-35673}:15672"
+    volumes:
+      - ./backend/docs/dev-ops/environment/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+volumes:
+  mysql-data:

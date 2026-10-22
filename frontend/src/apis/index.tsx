@@ -1,86 +1,42 @@
-// 请求地址
-const apiHostUrl = process.env.API_HOST_URL ? process.env.API_HOST_URL : "https://console-mock.apipost.cn/mock/6afa907d-6678-45e2-b867-032a11090abd";
+// Real backend only. Next.js injects this public API URL at build time.
+const apiHostUrl = (process.env.API_HOST_URL || "http://127.0.0.1:18091").replace(/\/$/, "");
 
-/**
- * 统一构造失败响应，避免调用方拿到 undefined 直接崩溃
- */
-const buildFailResponse = (info: string) => {
-    return new Response(JSON.stringify({code: "0001", info, data: null}), {
-        status: 200,
-        headers: {'Content-Type': 'application/json'}
-    });
-}
-
-/**
- * 活动装配（活动 SKU + 抽奖策略一起预热到 Redis）
- * 后端接口：GET /api/v1/raffle/activity/armory?activityId=100301
- * @param activityId 活动ID
- */
-export const strategyArmory = (activityId?: number) => {
+async function request(path: string, body?: object): Promise<Response> {
     try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/activity/armory?activityId=${activityId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-    } catch (error) {
-        return Promise.resolve(buildFailResponse("调用失败"));
-    }
-}
-
-/**
- * 查询抽奖奖品列表
- * 后端接口：POST /api/v1/raffle/strategy/query_raffle_award_list
- * @param userId 用户ID
- * @param activityId 活动ID
- */
-export const queryRaffleAwardList = (userId?: string, activityId?: number) => {
-    try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/strategy/query_raffle_award_list`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId: userId,
-                activityId: activityId
-            })
+        return await fetch(`${apiHostUrl}${path}`, {
+            method: body ? "POST" : "GET",
+            headers: {"Content-Type": "application/json"},
+            ...(body ? {body: JSON.stringify(body)} : {}),
+            signal: AbortSignal.timeout(15000),
         });
-    } catch (error) {
-        return Promise.resolve(buildFailResponse("调用失败"));
+    } catch {
+        return new Response(JSON.stringify({code: "NETWORK_ERROR", info: "无法连接后端，请检查服务和 API_HOST_URL", data: null}), {
+            status: 503,
+            headers: {"Content-Type": "application/json"},
+        });
     }
 }
 
-/**
- * 抽奖接口
- * 后端接口：POST /api/v1/raffle/activity/draw
- * @param userId 用户ID
- * @param activityId 活动ID
- *
- * {
- * 	"code": "0000",
- * 	"info": "调用成功",
- * 	"data": {
- * 	    "awardIndex": 1, // awardIndex 获得的是列表中第几个奖品，方便测试使用
- * 		"awardId": 535,
- * 		"awardTitle": "一部手机"
- * 	}
- * }
- */
-export const draw = (userId?: string, activityId?: number) => {
-    try {
-        return fetch(`${apiHostUrl}/api/v1/raffle/activity/draw`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify({
-                userId: userId,
-                activityId: activityId
-            })
-        })
-    } catch (error) {
-        return Promise.resolve(buildFailResponse("调用失败"));
-    }
+export const strategyArmory = (activityId: number) =>
+    request(`/api/v1/raffle/activity/armory?activityId=${activityId}`);
+
+export const queryRaffleAwardList = (userId: string, activityId: number) =>
+    request("/api/v1/raffle/strategy/query_raffle_award_list", {userId, activityId});
+
+export const draw = (userId: string, activityId: number) =>
+    request("/api/v1/raffle/activity/draw", {userId, activityId});
+
+export async function readResponse<T>(response: Promise<Response>): Promise<T> {
+    const res = await response;
+    const body = await res.json();
+    if (!res.ok || body.code !== "0000") throw new Error(`${body.code}: ${body.info}`);
+    return body.data as T;
+}
+
+export function getActivityContext() {
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("userId")?.trim() || "fullstack_demo";
+    const activityId = Number(params.get("activityId") || "100301");
+    if (!Number.isSafeInteger(activityId) || activityId <= 0) throw new Error("activityId 必须是正整数");
+    return {userId, activityId};
 }

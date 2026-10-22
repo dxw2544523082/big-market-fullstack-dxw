@@ -1,11 +1,11 @@
 package cn.bugstack.config;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONReader;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.filter.Filter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.BaseCodec;
@@ -52,22 +52,31 @@ public class RedisClientConfig {
 
     static class RedisCodec extends BaseCodec {
 
+        // Restore domain types written with @type, without globally enabling arbitrary AutoType.
+        private static final Filter ALLOWED_TYPES = JSONReader.autoTypeFilter(
+                "cn.bugstack.domain.",
+                "java.util.ArrayList", "java.util.HashMap", "java.util.LinkedHashMap", "java.util.HashSet"
+        );
+
         private final Encoder encoder = in -> {
             ByteBuf out = ByteBufAllocator.DEFAULT.buffer();
             try {
-                ByteBufOutputStream os = new ByteBufOutputStream(out);
-                JSON.writeJSONString(os, in, SerializerFeature.WriteClassName);
-                return os.buffer();
-            } catch (IOException e) {
-                out.release();
-                throw e;
+                // Typed fields already describe HashMap/ArrayList contents. Avoid redundant @type
+                // metadata that breaks nested typed-map parsing in Fastjson2 2.0.28.
+                out.writeBytes(JSON.toJSONBytes(in, JSONWriter.Feature.WriteClassName,
+                        JSONWriter.Feature.NotWriteHashMapArrayListClassName));
+                return out;
             } catch (Exception e) {
                 out.release();
                 throw new IOException(e);
             }
         };
 
-        private final Decoder<Object> decoder = (buf, state) -> JSON.parseObject(new ByteBufInputStream(buf), Object.class);
+        private final Decoder<Object> decoder = (buf, state) -> {
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.readBytes(bytes);
+            return JSON.parseObject(bytes, Object.class, ALLOWED_TYPES);
+        };
 
         @Override
         public Decoder<Object> getValueDecoder() {

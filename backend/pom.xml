@@ -20,7 +20,7 @@
         <repository>
             <id>nexus-aliyun</id>
             <name>nexus-aliyun</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <url>https://maven.aliyun.com/repository/public</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -131,12 +131,7 @@
                 <artifactId>db-router-spring-boot-starter</artifactId>
                 <version>1.0.2</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-amqp -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-amqp</artifactId>
-                <version>3.2.0</version>
-            </dependency>
+            <!-- AMQP 版本由 Spring Boot 2.7.12 的 BOM 统一管理，避免混入 Boot 3 / Java 17 依赖。 -->
 
             <!-- 工程模块 -->
             <dependency>

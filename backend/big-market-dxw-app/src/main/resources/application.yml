@@ -2,4 +2,4 @@ spring:
   config:
     name: big-market-dxw-app
   profiles:
-    active: prod
+    active: ${SPRING_PROFILES_ACTIVE:local}

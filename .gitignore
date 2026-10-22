@@ -1,0 +1,24 @@
+# Local secrets / machine-specific settings
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+# Dependencies, build outputs and IDE state
+**/node_modules/
+**/target/
+**/.next/
+**/out/
+**/.idea/
+**/.vscode/
+**/next-env.d.ts
+**/*.tsbuildinfo
+**/__pycache__/
+# Runtime files
+.runtime/
+**/data/
+**/log/
+**/logs/
+*.log
+.DS_Store
